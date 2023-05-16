@@ -41,7 +41,7 @@ function addListItem() {
     };
 }
 
-btnAdd.addEventListener('click', addListItem);
+btnAdd.addEventListener('click', createNewTodoToBackend);
 
 btnUpdate.addEventListener('click', function() {
     let firstElement = list.firstElementChild;
@@ -83,3 +83,35 @@ function getTodoFromBackend() {
 }
 
 getTodoFromBackend();
+
+
+//send a call to the backend
+function createNewTodoToBackend() {
+    //alert('hi');
+    let http = new XMLHttpRequest();
+
+    http.open('POST', 'https://jsonplaceholder.typicode.com/todos', true);
+    let newTodo = {
+        "userId": 1,
+        "title": currentInputValue,
+        "completed": false
+    };
+    http.send(JSON.stringify(newTodo));
+
+    http.onreadystatechange = function() {
+        if(this.readyState === 4) {
+            if(this.status === 201) {
+                let response = JSON.parse(this.responseText);
+                list.appendChild(createTodoDynamicallyFromBackend(response.id, currentInputValue));
+                currentInputValue = '';
+                // for (let index = 0; index < response.length; index++) {
+                //     list.appendChild(createTodoDynamicallyFromBackend(response[index].id, response[index].title));
+                // }
+                //console.log('Add item');
+
+            } else {
+                console.log('Request failed.');
+            }
+        }
+    };
+}
